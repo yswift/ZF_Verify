@@ -1,3 +1,4 @@
+# import keras
 from captcha.dataset import *
 
 def build_model():
@@ -12,11 +13,11 @@ def build_model():
                      input_shape=input_shape))
     model.add(keras.layers.Conv2D(64, (3, 3), activation='relu'))
     model.add(keras.layers.MaxPooling2D(pool_size=(2, 2)))
-    model.add(keras.layersDropout(0.25))
-    model.add(keras.layersFlatten())
-    model.add(keras.layersDense(128, activation='relu'))
-    model.add(keras.layersDropout(0.5))
-    model.add(keras.layersDense(num_classes, activation='softmax'))
+    model.add(keras.layers.Dropout(0.25))
+    model.add(keras.layers.Flatten())
+    model.add(keras.layers.Dense(128, activation='relu'))
+    model.add(keras.layers.Dropout(0.5))
+    model.add(keras.layers.Dense(num_classes, activation='softmax'))
 
     model.compile(loss=keras.losses.categorical_crossentropy,
                   optimizer=keras.optimizers.Adadelta(),
@@ -28,7 +29,7 @@ def train():
 
     model = build_model()
     batch_size = 64
-    epochs = 10
+    epochs = 20
     model.fit(x_train, t_train,
               batch_size=batch_size,
               epochs=epochs,
@@ -38,7 +39,9 @@ def train():
     print('Test loss:', score[0])
     print('Test accuracy:', score[1])
 
-    model.save(r'.\model.h5')
+    # model.save(r'.\model.h5')
 
-# import os
-# os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
+if __name__ == '__main__':
+    # import os
+    # os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
+    train()
