@@ -15,6 +15,7 @@
             min-width: 200px;
         }
         span {
+            font-family: Consolas;
             font-size: 6em;
             margin-left: 40px;
             color: rgb(0,0,153);
@@ -24,9 +25,13 @@
 <body>
 <h1>AI学习，识别正方系统验证码</h1>
 <div>
-    <h3>下面的图片是从正方系统获取的验证码，以及识别结果</h3>
+    <h3>下面的图片是从正方系统获取的验证码，以及识别结果，刷新页面获取新验证码。</h3>
 <img src="data:image/gif;base64,{{ base64 }}"/>
 <span>{{ code }}</span>
+    <p>学习深度学习后的第一个应用，提供两个接口供其他程序调用：</p>
+    <p>接受图像的接口 /api/image, <a href="image_demo">测试</a></p>
+    <p>接受图像base64的接口 /api/base64, <a href="base64_demo">测试</a></p>
+    <p>所有源码在github，<a href="https://github.com/yswift/ZF_Verify">请单击这里访问</a></p>
 </div>
 </body>
 </html>

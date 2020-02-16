@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Image API DEMO</title>
+    <style>
+        h1 {
+            text-align: center;
+        }
+        div{
+            margin:0 auto;
+            width:50%;
+        }
+    </style>
+</head>
+<h1>Image API DEMO</h1>
+<div>
+    <h2>上传图像，识别验证码，返回json数据</h2>
+    <h3>URL: verify/image，提交方式：post，参数：file=xxx</h3>
+    <h3>成功：{"status":0, "code":"识别得到的验证码"}</h3>
+    <h3>失败：{"status":1, "code":"识别得到的验证码"}</h3>
+    <form action="verify/image" method="post" enctype = "multipart/form-data">
+        <input type = "file" name = "file" />
+        <input type="submit" value="提交">
+    </form>
+</div>
+</body>
+</html>

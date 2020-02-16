@@ -4,14 +4,13 @@ from captcha.dataset import *
 def build_model():
     num_classes = len(letters);
     input_shape = get_input_shape()
-    # 以下模型和mnist-cnn相同
-    # 两层3x3窗口的卷积(卷积核数为32和64)，一层最大池化(MaxPooling2D)
+    # 两层2x2窗口的卷积(卷积核数为32和64)，一层最大池化(MaxPooling2D)
     # 再Dropout(随机屏蔽部分神经元)并一维化(Flatten)到128个单元的全连接层(Dense)，最后Dropout输出到33个单元的全连接层（全部字符为33个）
     model = keras.models.Sequential()
-    model.add(keras.layers.Conv2D(32, kernel_size=(3, 3),
+    model.add(keras.layers.Conv2D(32, kernel_size=(2, 2),
                      activation='relu',
                      input_shape=input_shape))
-    model.add(keras.layers.Conv2D(64, (3, 3), activation='relu'))
+    model.add(keras.layers.Conv2D(64, (2, 2), activation='relu'))
     model.add(keras.layers.MaxPooling2D(pool_size=(2, 2)))
     model.add(keras.layers.Dropout(0.25))
     model.add(keras.layers.Flatten())
@@ -28,8 +27,8 @@ def train():
     x_train, t_train, x_test, t_test = get_image()
 
     model = build_model()
-    batch_size = 64
-    epochs = 20
+    batch_size = 100
+    epochs = 15
     model.fit(x_train, t_train,
               batch_size=batch_size,
               epochs=epochs,
@@ -39,7 +38,7 @@ def train():
     print('Test loss:', score[0])
     print('Test accuracy:', score[1])
 
-    # model.save(r'.\model.h5')
+    model.save(r'.\model.h5')
 
 if __name__ == '__main__':
     # import os

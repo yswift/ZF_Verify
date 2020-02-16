@@ -1,27 +1,42 @@
-from flask import Flask
+from flask import Flask, request
 from flask import render_template
+from PIL import Image
 from captcha.predict import predict
 
 app = Flask(__name__)
 
-# tensorflow 1.15
-# keras 2.2.5
+# 能正常工作的包
+# tensorflow 1.15，keras 2.2.5 只支持1.15,不能用2.0以上
+# keras 2.2.5，不能用2.3
 # 使用 keras 2.3.1 报线程错，
 
-p = predict(True, True)
+p = predict()
 
 @app.route('/')
 def hello_world():
-    # return "hello world"
-    p.get_image()
-    image = p.get_image()
-    images = p.handle_split_image(image)
-    # base64 = p.base64
-    # print("base64=",base64)
-    code = p.predict(images)
-    # base64 = "R0lGODlhSAAbAPcAAAAAAIAAAACAAICAAAAAgIAAgACAgICAgMDAwP8AAAD/AP//AAAA//8A/wD//////wAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAMwAAZgAAmQAAzAAA/wAzAAAzMwAzZgAzmQAzzAAz/wBmAABmMwBmZgBmmQBmzABm/wCZAACZMwCZZgCZmQCZzACZ/wDMAADMMwDMZgDMmQDMzADM/wD/AAD/MwD/ZgD/mQD/zAD//zMAADMAMzMAZjMAmTMAzDMA/zMzADMzMzMzZjMzmTMzzDMz/zNmADNmMzNmZjNmmTNmzDNm/zOZADOZMzOZZjOZmTOZzDOZ/zPMADPMMzPMZjPMmTPMzDPM/zP/ADP/MzP/ZjP/mTP/zDP//2YAAGYAM2YAZmYAmWYAzGYA/2YzAGYzM2YzZmYzmWYzzGYz/2ZmAGZmM2ZmZmZmmWZmzGZm/2aZAGaZM2aZZmaZmWaZzGaZ/2bMAGbMM2bMZmbMmWbMzGbM/2b/AGb/M2b/Zmb/mWb/zGb//5kAAJkAM5kAZpkAmZkAzJkA/5kzAJkzM5kzZpkzmZkzzJkz/5lmAJlmM5lmZplmmZlmzJlm/5mZAJmZM5mZZpmZmZmZzJmZ/5nMAJnMM5nMZpnMmZnMzJnM/5n/AJn/M5n/Zpn/mZn/zJn//8wAAMwAM8wAZswAmcwAzMwA/8wzAMwzM8wzZswzmcwzzMwz/8xmAMxmM8xmZsxmmcxmzMxm/8yZAMyZM8yZZsyZmcyZzMyZ/8zMAMzMM8zMZszMmczMzMzM/8z/AMz/M8z/Zsz/mcz/zMz///8AAP8AM/8AZv8Amf8AzP8A//8zAP8zM/8zZv8zmf8zzP8z//9mAP9mM/9mZv9mmf9mzP9m//+ZAP+ZM/+ZZv+Zmf+ZzP+Z///MAP/MM//MZv/Mmf/MzP/M////AP//M///Zv//mf//zP///yH5BAEAABAALAAAAABIABsAAAj/AKkJHDjwjyqCCBMqFJjq4MKHEBWm+kfx3xqK1ayssFKtosdq1QB19EhxBzVAK1JWU0SylcdoJCvGi1nxDEWBFRNVVJUSEE1AGlNa8fmvVMWgVaxQ42OIYqwtNKP+s0URE01qE2OmXDGS4qJ/VVKG3aqK5FaajKRKVRfTlVWc/9Sso8hzY8y6Iv/VtUJSI1+1gAPfTLXJI9CUZUmiXJH431mPWzV2xZh0RZUqjSnuqdj0HyGKoDw2g1ux2lZASX1SpRbSo9+Kq8aSrYgFrNCtXD1mi6qF4tx/WM3ixj25tNiK1HADIrqz57+QQv8Jq9hFrZmb1D4GJVq3Cs2xk6nh/41p2nLFpN57/9sW+ArwrBQXez+aMrvHscwpukq+Iv/508V5hEtgAs3BD0VbTTZWZmNZIQRFQ/wzBoLmkRRNRpEBcqBanEQVHF3HUVSGbSvYR+JfFL2QxX/z/YRbi/+gSGB2aclHUlgt2uiRFPelJGJ8VlSRxz95LMZYVDpJ9WF5FcbnnF4pxWCiiRUtRuV4Th5JUxM0hQacfYehlBduYEZWWX+KIZamZaqoEhQ1xwhG0od0YSjbCn9QONxsFUUjQ4jG3GTkVnnGlExMLnlEGnJBPalXkKihtkqbiV1D0Raq+GdYpKqMYUpg58REJ0mZHhQTTIGRI2cw/7wgp6jUQIBz0au0xsRErfpV9Jmi8EWFw6vAVDQFRaGoNQdgNsGi1qJR7ULTJP+ggus/aQWmC0nBipqVezF1RpM005K0jEfXCsaLolTSNGJMQXg0ZLiC1bJsr/BSdEpUo1Skar2wVsSeVCsK1gm/tWI1LEXDRKUMwRWVS5NNBUck8cQUV6xQQAA7DQo8IURPQ1RZUEUgSFRNTCBQVUJMSUMgIi0vL1czQy8vRFREIEhUTUwgNC4wIFRyYW5zaXRpb25hbC8vRU4iPg0KPEhUTUw+DQoJPEhFQUQ+DQoJCTx0aXRsZT5DaGVja0NvZGU8L3RpdGxlPjxtZXRhIGh0dHAtZXF1aXY9IlgtVUEtQ29tcGF0aWJsZSIgY29udGVudD0iSUU9RW11bGF0ZUlFNyI+DQoJCTxtZXRhIG5hbWU9IkdFTkVSQVRPUiIgY29udGVudD0iTWljcm9zb2Z0IFZpc3VhbCBTdHVkaW8gLk5FVCA3LjEiPg0KCQk8bWV0YSBuYW1lPSJDT0RFX0xBTkdVQUdFIiBjb250ZW50PSJWaXN1YWwgQmFzaWMgLk5FVCA3LjEiPg0KCQk8bWV0YSBuYW1lPSJ2c19kZWZhdWx0Q2xpZW50U2NyaXB0IiBjb250ZW50PSJKYXZhU2NyaXB0Ij4NCgkJPG1ldGEgbmFtZT0idnNfdGFyZ2V0U2NoZW1hIiBjb250ZW50PSJodHRwOi8vc2NoZW1hcy5taWNyb3NvZnQuY29tL2ludGVsbGlzZW5zZS9pZTUiPg0KCTwvSEVBRD4NCgk8Ym9keSBNU19QT1NJVElPTklORz0iR3JpZExheW91dCI+DQoJCTxmb3JtIG5hbWU9IkZvcm0xIiBtZXRob2Q9InBvc3QiIGFjdGlvbj0iQ2hlY2tDb2RlLmFzcHgiIGlkPSJGb3JtMSI+DQo8aW5wdXQgdHlwZT0iaGlkZGVuIiBuYW1lPSJfX1ZJRVdTVEFURSIgdmFsdWU9ImREd3ROalUwTXpjeU1UazFPenMrQ2JNc0ZkNFZjMTRTT0lJdDJkYmwvU3hZaWdFPSIgLz4NCg0KCQkJPEZPTlQgZmFjZT0iy87M5SI+PC9GT05UPg0KCQk8L2Zvcm0+DQoJPC9ib2R5Pg0KPC9IVE1MPg0K"
-    # code = "1234"
-    return render_template('index.html', base64=p.base64, code=code)
+    base64,code = p.verify_url()
+    return render_template('index.html', base64=base64, code=code)
+
+@app.route("/image_demo", methods=["GET"])
+def image_demo():
+    return render_template('image_demo.html')
+
+@app.route("/verify/image", methods=["POST"])
+def verify_image():
+    f = request.files['file']
+    image = Image.open(f)
+    code = p.verify_image(image)
+    return {"status":0, "code":code}
+
+@app.route("/base64_demo", methods=["GET"])
+def base64_demo():
+    return render_template('base64_demo.html')
+
+@app.route("/verify/base64", methods=["POST"])
+def verify_base64():
+    base64 = request.form.get('base64')
+    code = p.verify_base64(base64)
+    return {"status":0, "code":code}
 
 if __name__ == '__main__':
     app.run()
