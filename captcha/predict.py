@@ -44,7 +44,8 @@ class predict:
         '''
         切割验证码，返回包含四个字符图像的列表
         '''
-        im = image.point(lambda i: i != 43, mode='1')
+        # im = image.point(lambda i: i != 43, mode='1')
+        im = image.convert('1')
         y_min, y_max = 0, 23  # im.height - 1 # 26
         split_lines = [5, 17, 29, 41, 53]
         ims = [im.crop([u, y_min, v, y_max]) for u, v in zip(split_lines[:-1], split_lines[1:])]
@@ -81,6 +82,7 @@ class predict:
         '''
         bs = base64.b64decode(b64)
         self.image = Image.open(io.BytesIO(bs))
+        # self.show_image()
         images = self.handle_split_image(self.image)
         code = self.predict(images)
         print("code=",code)
@@ -109,12 +111,15 @@ class predict:
         print("code = ", code)
         return code
 
+    def show_image(self):
+        import matplotlib.pyplot as plt
+        plt.imshow(self.image)
+        plt.show()
+
 if __name__ == '__main__':
     p = predict()
     p.verify_local()
     # p.verify_url()
-    import matplotlib.pyplot as plt
-    plt.imshow(p.image)
-    plt.show()
+    p.show_image()
     # for i in range(1,5):
     #     p.test()
