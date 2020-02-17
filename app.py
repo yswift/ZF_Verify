@@ -35,8 +35,10 @@ def base64_demo():
 @app.route("/verify/base64", methods=["POST"])
 def verify_base64():
     base64 = request.form.get('base64')
+    print("base64=",base64)
     code = p.verify_base64(base64)
     return {"status":0, "code":code}
+    # return {"status":0, "code":"1234"}
 
 if __name__ == '__main__':
     app.run(host="0.0.0.0",port=80)
