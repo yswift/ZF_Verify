@@ -9,16 +9,19 @@ import tensorflow as tf
 from captcha.common import *
 import base64
 
-graph = tf.get_default_graph()
-# graph = tf.compat.v1.get_default_graph
-# keras模型应用于flask app时会报bug !!
-# 以下链接可以解决问题
-# https://github.com/fchollet/keras/issues/2397
-
 class predict:
     def __init__(self):
         # self.model = keras.models.load_model(r'./captcha/model.h5')
         self.model = keras.models.load_model(r'./model.h5')
+        # 保证线程安全
+        # https://stackoverflow.com/questions/40850089/is-keras-thread-safe
+        # https://github.com/keras-team/keras/pull/13116
+        # have to initialize before threading
+        self.model._make_predict_function()
+        # keras模型应用于flask app时会报bug !!
+        # 以下链接可以解决问题
+        # https://github.com/fchollet/keras/issues/2397
+        self.graph = tf.get_default_graph()
 
     def get_image_from_url(self,url="http://jwxt.njupt.edu.cn/CheckCode.aspx"):
         '''
@@ -56,16 +59,16 @@ class predict:
         '''
         使用模型对四个字符的列表对应的验证码进行预测
         '''
+        global graph
         input_shape = get_input_shape()
         Y = []
         for i in range(4):
             im = images[i]
             test_input = np.concatenate(np.array(im))
             test_input = test_input.reshape(1, *input_shape)
-            y_probs = None
-            with graph.as_default():
+            with self.graph.as_default():
                 y_probs = self.model.predict(test_input)
-            Y.append(letters[y_probs[0].argmax(-1)])
+                Y.append(letters[y_probs[0].argmax()])
         return ''.join(Y)
 
     def verify_image(self, image):
