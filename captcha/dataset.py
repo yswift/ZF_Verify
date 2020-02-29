@@ -39,4 +39,6 @@ def get_image(folder=r"..\train_pictures\train"):
     test_labels = labels[tc:]
 
     # X = np.stack(X) # 将列表转换为矩阵
-    return np.stack(train_imgs), np.stack(train_labels), np.stack(test_imgs), np.stack(test_labels)
+    return np.stack(imgs), np.stack(labels), \
+           np.stack(train_imgs), np.stack(train_labels), \
+           np.stack(test_imgs), np.stack(test_labels)

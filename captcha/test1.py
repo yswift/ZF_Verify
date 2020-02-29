@@ -6,7 +6,7 @@ import numpy as np
 
 input_shape = get_input_shape()
 
-model = keras.models.load_model(r'./model.h5')
+model = keras.models.load_model(r'./model-99.93.h5')
 
 folder = r"..\train_pictures\train"
 total_acc = 0
@@ -33,5 +33,5 @@ for f in glob.glob(folder + r"\*"):  # 遍历当前目录下所有png后缀的�
     total_acc += acc
     total += tol
 
-print("total acc ", total_acc, "/", total)
+print("total acc ", total_acc, "/", total, (1.0*total_acc/total))
 
