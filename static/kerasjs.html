@@ -1,0 +1,111 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>AI学习，识别正方系统验证码</title>
+    <style>
+        h1 {
+            text-align: center;
+        }
+
+        div {
+            margin: 0 auto;
+            width: 50%;
+        }
+        /*
+        img {
+            min-width: 200px;
+        }*/
+
+        span {
+            font-family: Consolas;
+            font-size: 6em;
+            margin-left: 40px;
+            color: rgb(0, 0, 153);
+        }
+    </style>
+    <!-- <script src="keras.min.js"></script>
+    <script src="tf.js"></script> -->
+    <!--<script src="tfjs-vis.umd.min.js"></script>-->
+
+     <!-- Import TensorFlow.js -->
+     <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@latest"> </script>
+  <!-- Import tfjs-vis
+  <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-vis@latest/dist/tfjs-vis.umd.min.js"></script>-->
+
+</head>
+<body>
+<h1>AI学习，识别正方系统验证码</h1>
+<div>
+    <h3>下面的图片是从正方系统获取的验证码，以及识别结果，刷新页面获取新验证码。</h3>
+    <img id="img" src="0c6q.png"/>
+    <span id="code">code</span>
+    <p>使用keras-js在浏览器中识别验证码，为使用GreaseMonkey做准备。
+        <button id="btn">刷新</button>
+    </p>
+</div>
+<script>
+    function img2Tensor_old(imgData) {
+        let data = [];
+        // Image.Convert()的模式"1"可以把彩色图转换成黑白图
+        // 彩色图转灰度图 依据ITU-R 601-2 luma transform
+        //  L = R * 299/1000 + G * 587/1000 + B * 114/1000
+        // 灰度图转二值图, 默认阈值127，
+        for (var i=0,len=imgData.data.length/4; i<len; i++) {
+            data[i] = (imgData.data[i] * 299.0/1000 +
+                    imgData.data[i+1] * 587.0/1000 +
+                    imgData.data[i+2] * 114.0/1000) >= 127 ? 1.0:0.0;
+        }
+        return tf.tensor(data).reshape([1,12,23,1]);
+        //return tf.tensor(data).expandDims(0);
+    }
+
+    function img2Tensor(imgData) {
+        let tensor = tf.browser.fromPixels(imgData, numChannels = 1);
+        //resize to 12 x 23
+        //const resized = tf.image.resizeBilinear(tensor, [12, 23]).toFloat();
+        // Normalize the image
+        const offset = tf.scalar(255.0);
+        //const normalized = tf.scalar(1.0).sub(tensor.div(offset));
+        const normalized = tensor.div(offset);
+        return tensor.reshape([12, 23, 1]);
+    }
+
+    function getImages() {
+        var canvas = document.createElement("canvas");
+        // Copy the image contents to the canvas
+        var ctx = canvas.getContext("2d");
+        var img = document.getElementById("img");
+        canvas.width = img.naturalWidth;
+        canvas.height = img.naturalHeight;
+        ctx.drawImage(img, 0, 0);
+        // 分割图像
+        var sw = [5,17,28,41];
+        var imgs = [];
+        for (var i=0; i<sw.length; i++) {
+            var d = ctx.getImageData(sw[i], 0, 12, 23);
+            imgs.push(img2Tensor(d));
+        }
+        // 合并到一个张量中
+        return tf.stack([imgs[0],imgs[1],imgs[2],imgs[3]]);
+    }
+
+    async function detect() {
+        tf.enableProdMode();
+        var labels = "012345678abcdefghijklmnpqrstuvwxy";
+        var model = await tf.loadLayersModel('model.json?1');
+        var data = getImages();
+        var idx = await model.predict(data).argMax([-1]).dataSync();
+        var code = "";
+        for (var i = 0; i < idx.length; i++) {
+            code += labels[idx[i]];
+        }
+        console.log("predict = " + code);
+        var ce = document.getElementById("code");
+        ce.innerHTML = code;
+        return code;
+    }
+    var btn = document.getElementById('btn');
+    btn.onclick = detect;
+</script>
+</body>
+</html>
