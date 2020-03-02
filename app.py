@@ -2,8 +2,10 @@ from flask import Flask, request
 from flask import render_template
 from PIL import Image
 from captcha.predict import predict
+# from flask_cors import *
 
 app = Flask(__name__)
+# CORS(app, supports_credentials=True)
 
 # 能正常工作的包
 # tensorflow 1.15，keras 2.2.5 只支持1.15,不能用2.0以上
