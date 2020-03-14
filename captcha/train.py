@@ -1,5 +1,6 @@
 # import keras
 from captcha.dataset import *
+# import tensorflow.keras as keras
 
 def build_model():
     num_classes = len(letters);
@@ -29,17 +30,26 @@ def train():
     model = build_model()
     batch_size = 100
     epochs = 15
+
+    callbacks = [
+        keras.callbacks.TensorBoard(
+            log_dir="my_log",
+            histogram_freq=1,
+            embeddings_freq=1,
+            #embeddings_data=x_train
+        )]
     model.fit(x_train, t_train,
               batch_size=batch_size,
               epochs=epochs,
               verbose=1,
+              # callbacks=callbacks,
               validation_data=(x_test, t_test))
     # 验证所有数据
     score = model.evaluate(x_all, t_all, verbose=0)
     print('Test loss:', score[0])
     print('Test accuracy:', score[1])
 
-    model.save(r'.\model-%.2f.h5'% (score[1]*100))
+    model.save(r'.\model-%.3f.h5'% (score[1]*100))
 
 if __name__ == '__main__':
     # import os
