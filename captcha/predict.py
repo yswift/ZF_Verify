@@ -10,9 +10,10 @@ from captcha.common import *
 import base64
 
 class predict:
-    def __init__(self):
+    def __init__(self, model_fn = r'./model-99.967.h5'):
+        # model-99.967.h5 库版本 keras 2.3.1, tensorflow 2.1
         # self.model = keras.models.load_model(r'./captcha/model.h5')
-        self.model = keras.models.load_model(r'./model.h5')
+        self.model = keras.models.load_model(model_fn)
         # 保证线程安全
         # https://stackoverflow.com/questions/40850089/is-keras-thread-safe
         # https://github.com/keras-team/keras/pull/13116

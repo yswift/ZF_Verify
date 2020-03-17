@@ -12,7 +12,7 @@ app = Flask(__name__)
 # keras 2.2.5，不能用2.3
 # 使用 keras 2.3.1 报线程错，
 
-p = predict()
+p = predict(r'./model.h5')
 
 @app.route('/')
 def hello_world():

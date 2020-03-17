@@ -6,7 +6,7 @@ import numpy as np
 
 input_shape = get_input_shape()
 
-model = keras.models.load_model(r'./model-99.93.h5')
+model = keras.models.load_model(r'./model-99.967.h5')
 
 folder = r"..\train_pictures\train"
 total_acc = 0
