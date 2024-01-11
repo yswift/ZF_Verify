@@ -27,6 +27,7 @@
     <!--<script src="tfjs-vis.umd.min.js"></script>-->
 
      <!-- Import TensorFlow.js -->
+	 <script src='tf.min.js'></script>
      <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@latest"> </script>
   <!-- Import tfjs-vis
   <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-vis@latest/dist/tfjs-vis.umd.min.js"></script>-->
@@ -41,6 +42,7 @@
     <span id="code">code</span>
     <p>使用keras-js在浏览器中识别验证码，为使用GreaseMonkey做准备。
         <button id="btn">刷新</button>
+		<button onclick='get_save_model()'>获取保存model</button>
     </p>
 </div>
 <script>
@@ -110,6 +112,12 @@
     var btn = document.getElementById('btn');
     btn.onclick = detect;
     detect();
+	
+	async function get_save_model() {
+		var model = await tf.loadLayersModel('model.json');
+		await model.save('localstorage://zf-code');
+		console.log('save finish');
+	}
 </script>
 </body>
 </html>

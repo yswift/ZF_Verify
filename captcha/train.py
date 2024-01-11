@@ -1,4 +1,4 @@
-# import keras
+import keras
 from captcha.dataset import *
 # import tensorflow.keras as keras
 
@@ -13,15 +13,16 @@ def build_model():
                      input_shape=input_shape))
     model.add(keras.layers.Conv2D(64, (3, 3), activation='relu', padding='same'))
     model.add(keras.layers.MaxPooling2D(pool_size=(2, 2)))
-    # model.add(keras.layers.Dropout(0.2))
-    model.add(keras.layers.Flatten())
-    model.add(keras.layers.Dense(128, activation='relu'))
     model.add(keras.layers.Dropout(0.3))
+    model.add(keras.layers.Flatten())
+    # model.add(keras.layers.Dense(128, activation='relu'))
+    # model.add(keras.layers.Dropout(0.3))
     model.add(keras.layers.Dense(num_classes, activation='softmax'))
 
-    model.compile(loss=keras.losses.categorical_crossentropy,
-                  optimizer=keras.optimizers.Adadelta(),
+    model.compile(loss='categorical_crossentropy',
+                  optimizer='adam',
                   metrics=['accuracy'])
+    model.summary()
     return model
 
 def train():
@@ -29,7 +30,7 @@ def train():
 
     model = build_model()
     batch_size = 100
-    epochs = 15
+    epochs = 10
 
     callbacks = [
         keras.callbacks.TensorBoard(
@@ -54,4 +55,6 @@ def train():
 if __name__ == '__main__':
     # import os
     # os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
+    # model = build_model()
+    # model.summary()
     train()

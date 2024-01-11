@@ -38,3 +38,19 @@ tflite_convert --keras_model_file=model-99.967.h5 --output_file=model.tflite
 model.tflite
 ```
 使用方法参见：[TFLiteZf](https://github.com/yswift/TFLiteZf)
+
+## 问题解决
+
+1. 错误：cannot import name 'shape_poly' from 'jax.experimental.jax2tf' 
+```
+vim ~/.local/lib/python3.10/site-packages/tensorflowjs/converters/jax_conversion.py
+#line29 comment
+#PolyShape = shape_poly.PolyShape
+#line 20 comment
+#from jax.experimental.jax2tf import shape_poly
+from jax.experimental.jax2tf import PolyShape
+```
+
+2. tensorflow.python.framework.errors_impl.NotFoundError: D:\Work\Machine-Learning\mlenv\Lib\site-packages\tensorflow_decision_forests\tensorflow\ops\inference\inference.so not found
+> windows 系统下的错误，用 wsl
+

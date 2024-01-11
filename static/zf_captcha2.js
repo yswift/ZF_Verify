@@ -66,7 +66,16 @@ function getImages() {
 async function detect() {
     tf.enableProdMode();
     var labels = "012345678abcdefghijklmnpqrstuvwxy";
-    var model = await tf.loadLayersModel('http://localhost/zf_code/model.json');
+    var model;
+    try {
+        model = await tf.loadLayersModel('localstorage://zf-code');
+        console.log('load localstorage://zf-code success');
+    } catch(err) {
+        console.log('load localstorage://zf-code failed');
+        model = await tf.loadLayersModel('http://localhost/zf_code/model.json');
+        console.log('load model from http success');
+        await model.save('localstorage://zf-code');
+    }
     var data = getImages();
     var idx = await model.predict(data).argMax([-1]).dataSync();
     var code = "";
